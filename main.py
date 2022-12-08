@@ -10,7 +10,8 @@ X = np.array([x2, x3, x1])
 k = 0  # initialize counter for solver
 e = 10 ** -3  # minimum error for slope
 
-maxLineseachSteps = 50;
+maxLineseachSteps = 50
+maxRalphsonSteps = 30
 
 sk = np.array([X[0], X[1]])  # state variables
 dk = np.array([X[2]])  # decision variable
@@ -65,6 +66,26 @@ def linesearch(dfdd, sk, dk, dhds_line, dhdd_line):  # inexact line search
         funct = f(X_step)
         phi = f(np.concatenate((sk, dk), axis=None)) - alpha * t * (dfdd)**2 #recalc for new alpha value
         i += 1
-    if i == maxLineseachSteps:
-        print("No convergence")
+
     return alpha, skstep_matrix
+
+# Newton ralphson
+def solvefunc(decision, state_approx):
+    c = 0
+    x1 = decision
+    x2 = state_approx[0]
+    x3 = state_approx[1]
+    skactual = np.array([x2, x3])
+    Xpart = np.concatenate((state_approx, decision), axis=None)
+    h = constraints(Xpart)
+    while np.linalg.norm(h) > 10 ** -3 and c < maxRalphsonSteps:
+        sktran = np.reshape(skactual, (2,1)) - np.matmul(
+            np.linalg.inv(np.array([[2 / 5 * Xpart[0], 2 / 25 * Xpart[1]], [1, -1]])), constraints(Xpart))
+        x2 = sktran[0]
+        x3 = sktran[1]
+        skactual = np.concatenate((x2, x3), axis=None)
+        Xpart = np.concatenate((x2, x3, x1), axis=None)
+        h = constraints(Xpart)
+        c += 1
+
+    return skactual
