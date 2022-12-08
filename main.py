@@ -78,7 +78,7 @@ def solvefunc(decision, state_approx):
     skactual = np.array([x2, x3])
     Xpart = np.concatenate((state_approx, decision), axis=None)
     h = constraints(Xpart)
-    while np.linalg.norm(h) > 10 ** -3 and c < maxRalphsonSteps:
+    while np.linalg.norm(h) >e and c < maxRalphsonSteps:
         sktran = np.reshape(skactual, (2,1)) - np.matmul(
             np.linalg.inv(np.array([[2 / 5 * Xpart[0], 2 / 25 * Xpart[1]], [1, -1]])), constraints(Xpart))
         x2 = sktran[0]
@@ -103,7 +103,7 @@ while np.linalg.norm(dfdd) > e and k < maxRalphsonSteps:  # solver loop
     dhdd = np.array([[1 / 2 * X[2]], [1]])
     dfdd = dfdx1 - np.matmul(np.matmul(dfds, np.linalg.inv(dhds)), dhdd)
     k += 1
-    print(X, dfdd)
+
 sol = f(X)
 print("x1 = " + np.array2string(X[2]) + "\nx2 = " + np.array2string(X[0]) + "\nx3 = " + np.array2string(
-    X[1]) + "\ndfdd = " + np.array2string(dfdd) + "\nf(x) = " + np.array2string(sol) )
+    X[1]) + "\nf(x) = " + np.array2string(sol) )
