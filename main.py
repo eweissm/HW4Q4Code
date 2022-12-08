@@ -89,3 +89,21 @@ def solvefunc(decision, state_approx):
         c += 1
 
     return skactual
+
+while np.linalg.norm(dfdd) > e and k < maxRalphsonSteps:  # solver loop
+    alphak, stepmatrix = linesearch(dfdd, sk, dk, dhds, dhdd)
+    dk = dk - alphak * dfdd
+    sk_lin_approx = sk + alphak * stepmatrix
+    sk = solvefunc(dk, sk_lin_approx)
+    X = np.concatenate((sk, dk), axis=None)
+    dfdx1 = np.array([2 * X[2]])
+    dfds = np.array([2 * X[0], 2 * X[1]])
+    dhds = np.array([[2 / 5 * X[0], 2 / 25 * X[1]],
+                     [1, -1]])
+    dhdd = np.array([[1 / 2 * X[2]], [1]])
+    dfdd = dfdx1 - np.matmul(np.matmul(dfds, np.linalg.inv(dhds)), dhdd)
+    k += 1
+    print(X, dfdd)
+sol = f(X)
+print("x1 = " + np.array2string(X[2]) + "\nx2 = " + np.array2string(X[0]) + "\nx3 = " + np.array2string(
+    X[1]) + "\ndfdd = " + np.array2string(dfdd) + "\nf(x) = " + np.array2string(sol) )
